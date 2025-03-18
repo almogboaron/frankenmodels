@@ -1,3 +1,5 @@
 env/
 data/
 notebooks/
+trained_models/
+results/

@@ -1,0 +1,3 @@
+model_type,num_parameters,avg_inference_time_sec,max_memory_MB
+Base Model,109483778,0.1301978349685669,913.12841796875
+Frankenmodel,109483778,0.14707497358322144,913.12841796875

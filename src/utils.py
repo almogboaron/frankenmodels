@@ -25,6 +25,19 @@ def tokenize_function(examples, tokenizer, max_length=128):
     tokenized["label"] = examples["label"]
     return tokenized
 
+def load_tokenized_dataset(tokenizer, split="validation", max_length=128):
+    """
+    split = validation/test
+    """
+    dataset = load_dataset("glue", "sst2")
+    tokenized_dataset = dataset[split].map(
+        lambda x: tokenize_function(x, tokenizer, max_length),
+        batched=True,
+        remove_columns=[col for col in dataset[split].column_names if col not in ["label"]]
+    )
+    tokenized_dataset.set_format("torch", columns=["input_ids", "attention_mask", "label"])
+    return tokenized_dataset
+
 def load_and_tokenize_datasets(tokenizer, max_length=128):
     dataset = load_dataset("glue", "sst2")
     train_dataset = dataset["train"].map(
@@ -84,6 +97,11 @@ def load_trained_model(device, model_dir):
     model.to(device)
     return model
 
+def model_real_parameters(model):
+    unique_params = {id(p): p for p in model.parameters()}
+    num_unique = sum(p.numel() for p in unique_params.values())
+    return num_unique
+
 def load_frankenmodel(device, model_dir, duplicate_layers=None, duplication_counts=None):
     """
     Loads the fine-tuned model and creates a Frankenmodel by duplicating specified encoder layers.
@@ -107,8 +125,9 @@ def load_frankenmodel(device, model_dir, duplicate_layers=None, duplication_coun
                 idx = duplicate_layers.index(i)
                 count = duplication_counts[idx]
                 for _ in range(count):
-                    duplicate_layer = copy.deepcopy(layer)
-                    new_layers.append(duplicate_layer)
+                    #duplicate_layer = copy.deepcopy(layer)  #TODO:Check for soft copy to not spend more space on bigger model
+                    #new_layers.append(duplicate_layer)
+                    new_layers.append(layer)                 # Changed from Above to soft copy.
     model.bert.encoder.layer = new_layers
     model.config.num_hidden_layers = len(new_layers)
     return model

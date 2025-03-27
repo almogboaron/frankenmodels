@@ -8,9 +8,9 @@
   - [X] Run multiple experiments with different random seeds to ensure statistical significance.
   - [X] Check for consistency in the improvements across runs.
 
-- [ ] **Evaluate Trade-Offs:**
-  - [ ] Measure changes in model size, inference speed, and memory usage with each duplication.
-  - [ ] Determine if the performance gains justify the increased computational cost.
+- [X] **Evaluate Trade-Offs:**
+  - [X] Measure changes in model size, inference speed, and memory usage with each duplication.
+  - [X] Determine if the performance gains justify the increased computational cost.
 
 - [ ] **Expand Your Experiments:**
   - [ ] Test duplicating the same layer multiple times (e.g., duplicating layer 6 twice or three times).

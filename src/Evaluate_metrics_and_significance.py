@@ -39,12 +39,15 @@ def main(args):
         # Use a unique directory per seed.
         model_dir = os.path.join(args.model_output_dir, f"seed_{seed}")
         if not os.path.exists(model_dir):
+            print("Model with seed does not exist , creating it.")
             os.makedirs(model_dir, exist_ok=True)
             
             # Train the model (fine-tuning).
             print("Training the base model...")
             train_model(seed, model_dir, args.num_train_epochs, args.batch_size, args.learning_rate)
-            
+        
+        print("Model exists and trained")
+
         # Load tokenizer from the trained model.
         tokenizer = AutoTokenizer.from_pretrained(model_dir)
         # Get validation dataset.
@@ -145,4 +148,4 @@ if __name__ == "__main__":
 
 
 # Example
-# python src/train_evaluate_validate.py --batch_size 16 --seeds 42,43,44,45,46,47,48,49,50 --num_train_epochs 2 --duplicate_layers 6 --duplication_counts 1 --csv_path results.csv
+# python src/Evaluate_metrics_and_significance.py --batch_size 16 --seeds 42,43,44,45,46,47,48,49,50 --num_train_epochs 2 --duplicate_layers 6 --duplication_counts 1 --csv_path results.csv

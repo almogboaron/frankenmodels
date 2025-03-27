@@ -7,105 +7,10 @@ import copy
 import os
 import json
 from datasets import load_dataset
-from transformers import (BertForSequenceClassification, BertTokenizer,
+from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
                           TrainingArguments, Trainer, default_data_collator)
-from utils import tokenize_function, evaluate_model, get_dataloader
+from utils import tokenize_function, evaluate_model, get_dataloader ,set_seed,load_and_tokenize_datasets,train_model,load_trained_model,load_frankenmodel
 from scipy.stats import ttest_1samp
-
-def set_seed(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
-
-def load_and_tokenize_datasets(tokenizer, max_length=128):
-    dataset = load_dataset("glue", "sst2")
-    train_dataset = dataset["train"].map(
-        lambda x: tokenize_function(x, tokenizer, max_length),
-        batched=True,
-        remove_columns=[col for col in dataset["train"].column_names if col not in ["label"]]
-    )
-    val_dataset = dataset["validation"].map(
-        lambda x: tokenize_function(x, tokenizer, max_length),
-        batched=True,
-        remove_columns=[col for col in dataset["validation"].column_names if col not in ["label"]]
-    )
-    train_dataset.set_format("torch", columns=["input_ids", "attention_mask", "label"])
-    val_dataset.set_format("torch", columns=["input_ids", "attention_mask", "label"])
-    return train_dataset, val_dataset
-
-def train_model(seed, model_dir, num_train_epochs, batch_size, learning_rate):
-    set_seed(seed)
-    model_name = "bert-base-uncased"
-    tokenizer = BertTokenizer.from_pretrained(model_name)
-    train_dataset, val_dataset = load_and_tokenize_datasets(tokenizer)
-    
-    model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
-    
-    training_args = TrainingArguments(
-        output_dir=model_dir,
-        num_train_epochs=num_train_epochs,
-        per_device_train_batch_size=batch_size,
-        per_device_eval_batch_size=batch_size,
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        learning_rate=learning_rate,
-        logging_steps=50,
-        seed=seed,
-        report_to=[]  # disable external logging
-    )
-    
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=val_dataset,
-        tokenizer=tokenizer,
-        data_collator=default_data_collator,
-    )
-    
-    trainer.train()
-    
-    # Save the fine-tuned model and tokenizer.
-    model.save_pretrained(model_dir)
-    tokenizer.save_pretrained(model_dir)
-    
-    return model, tokenizer, val_dataset
-
-def load_trained_model(device, model_dir):
-    model = BertForSequenceClassification.from_pretrained(model_dir)
-    model.to(device)
-    return model
-
-def load_frankenmodel(device, model_dir, duplicate_layers=None, duplication_counts=None):
-    """
-    Loads the fine-tuned model and creates a Frankenmodel by duplicating specified encoder layers.
-    Args:
-        duplicate_layers: list of 0-indexed layer indices to duplicate.
-        duplication_counts: list of counts corresponding to duplicate_layers.
-    """
-    model = BertForSequenceClassification.from_pretrained(model_dir)
-    model.to(device)
-    for param in model.parameters():
-        param.requires_grad = False
-
-    original_layers = model.bert.encoder.layer
-    new_layers = torch.nn.ModuleList()
-    if duplicate_layers is None or duplication_counts is None:
-        new_layers = original_layers
-    else:
-        for i, layer in enumerate(original_layers):
-            new_layers.append(layer)
-            if i in duplicate_layers:
-                idx = duplicate_layers.index(i)
-                count = duplication_counts[idx]
-                for _ in range(count):
-                    duplicate_layer = copy.deepcopy(layer)
-                    new_layers.append(duplicate_layer)
-    model.bert.encoder.layer = new_layers
-    model.config.num_hidden_layers = len(new_layers)
-    return model
 
 def evaluate_models(device, tokenizer, val_dataset, batch_size, model_dir, duplicate_layers, duplication_counts):
     dataloader = get_dataloader(val_dataset, batch_size=batch_size)
@@ -133,14 +38,15 @@ def main(args):
         print(f"\n--- Running training and evaluation for seed {seed} ---")
         # Use a unique directory per seed.
         model_dir = os.path.join(args.model_output_dir, f"seed_{seed}")
-        os.makedirs(model_dir, exist_ok=True)
-        
-        # Train the model (fine-tuning).
-        print("Training the base model...")
-        train_model(seed, model_dir, args.num_train_epochs, args.batch_size, args.learning_rate)
-        
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir, exist_ok=True)
+            
+            # Train the model (fine-tuning).
+            print("Training the base model...")
+            train_model(seed, model_dir, args.num_train_epochs, args.batch_size, args.learning_rate)
+            
         # Load tokenizer from the trained model.
-        tokenizer = BertTokenizer.from_pretrained(model_dir)
+        tokenizer = AutoTokenizer.from_pretrained(model_dir)
         # Get validation dataset.
         _, val_dataset = load_and_tokenize_datasets(tokenizer)
         

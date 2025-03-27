@@ -4,9 +4,9 @@
   - [X] Compare improvements in accuracy, F1, precision, and recall.
   - [X] Note any layers that consistently show performance gains (e.g., layer 6 in your outputs).
 
-- [ ] **Validate Improvements:**
-  - [ ] Run multiple experiments with different random seeds to ensure statistical significance.
-  - [ ] Check for consistency in the improvements across runs.
+- [X] **Validate Improvements:**
+  - [X] Run multiple experiments with different random seeds to ensure statistical significance.
+  - [X] Check for consistency in the improvements across runs.
 
 - [ ] **Evaluate Trade-Offs:**
   - [ ] Measure changes in model size, inference speed, and memory usage with each duplication.

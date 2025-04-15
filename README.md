@@ -31,3 +31,5 @@
   - [ ] Share your results on forums (e.g., r/MachineLearning) or GitHub for feedback.
 
 This checklist should guide you through the next steps in your research to thoroughly evaluate the impact of layer duplication on your Frankenmodel's performance.
+- TODO: Check if we need to train the model from initilized-wights and not from pretrained.
+- 

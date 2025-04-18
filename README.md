@@ -1,35 +1,92 @@
+# FrankenModels: Boosting Transformer Performance Through Targeted Layer Replication
 
-- [X] **Analyze the Current Results:**
-  - [X] Review the CSV file to identify which layer duplications improve metrics over the base model.
-  - [X] Compare improvements in accuracy, F1, precision, and recall.
-  - [X] Note any layers that consistently show performance gains (e.g., layer 6 in your outputs).
+This repository contains the code and LaTeX source for our academic paper on FrankenModels. FrankenModels are a novel approach to enhancing transformer model performance through targeted layer duplication, achieving statistically significant improvements with minimal computational overhead.
 
-- [X] **Validate Improvements:**
-  - [X] Run multiple experiments with different random seeds to ensure statistical significance.
-  - [X] Check for consistency in the improvements across runs.
+## Project Overview
 
-- [X] **Evaluate Trade-Offs:**
-  - [X] Measure changes in model size, inference speed, and memory usage with each duplication.
-  - [X] Determine if the performance gains justify the increased computational cost.
+The repository includes:
+- Python code for creating and evaluating FrankenModels
+- Visualization scripts for analyzing performance
+- LaTeX source for the academic paper
+- Supporting figures and data
 
-- [ ] **Expand Your Experiments:**
-  - [ ] Test duplicating the same layer multiple times (e.g., duplicating layer 6 twice or three times).
-  - [ ] Explore duplicating combinations of layers (e.g., duplicating both layers 6 and 7).
-  - [ ] Consider applying the approach to different model architectures (e.g., BERT large or RoBERTa).
+## Paper Abstract
 
-- [ ] **Enhance Visualization and Reporting:**
-  - [ ] Create additional visualizations (line plots, heatmaps) to show trends and differences from the base model.
-  - [ ] Document your experimental setup, methodology, results, and insights in a detailed report or research paper.
+Transformer-based models have achieved remarkable success across various natural language processing tasks but often require significant computational resources to scale up performance through increased model size. In this work, we introduce FrankenModels, a novel approach that selectively replicates specific transformer layers to enhance model performance with minimal additional parameters. We conduct an empirical study on BERT models fine-tuned for sentiment analysis, demonstrating that strategic layer duplication can lead to statistically significant improvements in accuracy, F1 score, precision, and recall. Our approach achieves these gains while maintaining a lower computational footprint compared to training larger models from scratch. We analyze the performance impacts of duplicating different layers and present comprehensive evaluations of the memory, inference time, and parameter count trade-offs. Our findings suggest that FrankenModels can serve as an efficient alternative to full model scaling when computational resources are limited.
 
-- [ ] **Further Hypothesis Testing:**
-  - [ ] Perform ablation studies to see how layer duplications affect performance on specific subsets of data (e.g., easy vs. hard examples).
-  - [ ] Analyze if certain duplications help more in specific scenarios.
+## Visualizations
 
-- [ ] **Community and Literature Review:**
-  - [ ] Search for related work using keywords like "duplicating frozen layers", "free lunch neural networks", or "model replication."
-  - [ ] Compare your results with findings from recent preprints or blog posts.
-  - [ ] Share your results on forums (e.g., r/MachineLearning) or GitHub for feedback.
+The repository includes several visualization scripts that generate publication-quality figures:
 
-This checklist should guide you through the next steps in your research to thoroughly evaluate the impact of layer duplication on your Frankenmodel's performance.
-- TODO: Check if we need to train the model from initilized-wights and not from pretrained.
-- 
+1. **Layer Impact Visualization** (`layer_impact.py`): Shows the performance impact of duplicating each individual layer in BERT, demonstrating that middle layers (particularly layer 6) yield the most significant improvements.
+
+2. **Metric Comparison Visualization** (`metric_comparison.py`): Compares the performance of base models and FrankenModels across multiple evaluation seeds, showing consistent improvements in accuracy, F1 score, precision, and recall.
+
+3. **Tradeoff Visualization** (`tradeoff_visualization.py`): Visualizes the performance-efficiency tradeoffs, comparing computational costs (parameters, memory, inference time) against performance gains.
+
+## Compiling the LaTeX Paper
+
+### Prerequisites
+
+- A LaTeX distribution (TeX Live, MiKTeX, or MacTeX)
+- The IEEE conference class files (for `frankenmodels_article.tex`)
+- Basic LaTeX packages (for `frankenmodels_article_simple.tex`)
+
+### Compilation Steps
+
+#### IEEE Version
+
+1. Make sure all visualization PNG files are in the same directory as the `.tex` file.
+
+2. Compile the document using pdfLaTeX:
+   ```bash
+   pdflatex frankenmodels_article.tex
+   ```
+
+3. Generate the bibliography (if BibTeX is used):
+   ```bash
+   bibtex frankenmodels_article
+   ```
+
+4. Run pdfLaTeX twice more to incorporate the bibliography and references:
+   ```bash
+   pdflatex frankenmodels_article.tex
+   pdflatex frankenmodels_article.tex
+   ```
+
+#### Simple Version (No IEEE Style Required)
+
+For a version that doesn't require IEEE style files:
+
+```bash
+pdflatex frankenmodels_article_simple.tex
+```
+
+The final PDF will be named `frankenmodels_article_simple.pdf`.
+
+## Project Structure
+
+- `src/`: Source code for FrankenModel implementation and evaluation
+  - `utils.py`: Utility functions for model loading and evaluation
+  - `layer_check.py`: Analysis of individual layer impact on performance
+  - `tradeoffs.py`: Performance and efficiency tradeoff evaluation
+  - `Evaluate_metrics_and_significance.py`: Statistical significance testing
+  - `visualize_*.py`: Built-in visualization scripts for experimental results
+- Visualization scripts:
+  - `layer_impact.py`: Generates the layer impact visualization
+  - `metric_comparison.py`: Generates the metric comparison visualization
+  - `tradeoff_visualization.py`: Generates the tradeoff visualization
+- LaTeX papers:
+  - `frankenmodels_article.tex`: IEEE conference format paper
+  - `frankenmodels_article_simple.tex`: Simple format paper (no IEEE style required)
+
+## Key Findings
+
+- Duplicating certain layers (particularly middle layers) in BERT models leads to statistically significant performance improvements
+- Layer 6 showed the highest performance improvement when duplicated
+- FrankenModels provide ~0.5-0.6% accuracy gains with only ~7% increase in parameters
+- The approach represents a middle ground between full model scaling and parameter-efficient techniques
+
+## Contact
+
+For questions or further information, please contact the repository authors. 

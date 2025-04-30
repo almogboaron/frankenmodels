@@ -12,10 +12,11 @@
   - [X] Measure changes in model size, inference speed, and memory usage with each duplication.
   - [X] Determine if the performance gains justify the increased computational cost.
 
-- [ ] **Expand Your Experiments:**
-  - [ ] Test duplicating the same layer multiple times (e.g., duplicating layer 6 twice or three times).
-  - [ ] Explore duplicating combinations of layers (e.g., duplicating both layers 6 and 7).
-  - [ ] Consider applying the approach to different model architectures (e.g., BERT large or RoBERTa).
+- [X] **Expand Your Experiments:**
+  - [X] Test duplicating the same layer multiple times (e.g., duplicating layer 6 twice or three times).
+  - [X] Explore duplicating combinations of layers (e.g., duplicating both layers 6 and 7).
+  - [X] Consider applying the approach to different model architectures (e.g., BERT large or RoBERTa).
+  - [] Gready Algorithm?
 
 - [ ] **Enhance Visualization and Reporting:**
   - [ ] Create additional visualizations (line plots, heatmaps) to show trends and differences from the base model.

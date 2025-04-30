@@ -25,11 +25,8 @@ def tokenize_function(examples, tokenizer, max_length=128):
     tokenized["label"] = examples["label"]
     return tokenized
 
-def load_tokenized_dataset(tokenizer, split="validation", max_length=128):
-    """
-    split = validation/test
-    """
-    dataset = load_dataset("glue", "sst2")
+def load_tokenized_dataset(tokenizer, dataset_name="glue", subset="sst2", split="validation", max_length=128):
+    dataset = load_dataset(dataset_name, subset)
     tokenized_dataset = dataset[split].map(
         lambda x: tokenize_function(x, tokenizer, max_length),
         batched=True,
@@ -54,9 +51,10 @@ def load_and_tokenize_datasets(tokenizer, max_length=128):
     val_dataset.set_format("torch", columns=["input_ids", "attention_mask", "label"])
     return train_dataset, val_dataset
 
-def train_model(seed, model_dir, num_train_epochs, batch_size, learning_rate):
+def train_model(seed,model_name,model_dir, num_train_epochs, batch_size, learning_rate):
     set_seed(seed)
-    model_name = "bert-base-uncased"
+    #model_name ="bert-base-uncased",
+
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     train_dataset, val_dataset = load_and_tokenize_datasets(tokenizer)
     
@@ -114,7 +112,7 @@ def load_frankenmodel(device, model_dir, duplicate_layers=None, duplication_coun
     for param in model.parameters():
         param.requires_grad = False
 
-    original_layers = model.bert.encoder.layer
+    original_layers = model.base_model.encoder.layer
     new_layers = torch.nn.ModuleList()
     if duplicate_layers is None or duplication_counts is None:
         new_layers = original_layers
@@ -125,10 +123,10 @@ def load_frankenmodel(device, model_dir, duplicate_layers=None, duplication_coun
                 idx = duplicate_layers.index(i)
                 count = duplication_counts[idx]
                 for _ in range(count):
-                    #duplicate_layer = copy.deepcopy(layer)  #TODO:Check for soft copy to not spend more space on bigger model
-                    #new_layers.append(duplicate_layer)
-                    new_layers.append(layer)                 # Changed from Above to soft copy.
-    model.bert.encoder.layer = new_layers
+                    duplicate_layer = copy.deepcopy(layer)  #Done:Check for soft copy to not spend more space on bigger model :DONE
+                    new_layers.append(duplicate_layer)
+                    #new_layers.append(layer)                 # Changed from Above to soft copy.
+    model.base_model.encoder.layer = new_layers
     model.config.num_hidden_layers = len(new_layers)
     return model
 

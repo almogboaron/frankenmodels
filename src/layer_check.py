@@ -91,7 +91,7 @@ def main(args):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
 
-        # Iterate over each layer (for bert-base: 0 to 11)
+         #Iterate over layers
         for layer_idx in range(12):
             print(f"Evaluating Frankenmodel with duplication on layer {layer_idx}...")
             metrics = evaluate_on_layer(device, tokenizer, dataloader, layer_idx, model_dir="./results/bert_sst2")

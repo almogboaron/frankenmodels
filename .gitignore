@@ -2,4 +2,6 @@ env/
 data/
 notebooks/
 trained_models/
-results/
+results/bert_sst2/
+results/electra_sst2/
+results/roberta_sst2/
